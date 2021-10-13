@@ -414,7 +414,7 @@ public class AnkiActivity extends AppCompatActivity implements SimpleMessageDial
     }
 
 
-    protected void mayOpenUrl(Uri url) {
+    public void mayOpenUrl(Uri url) {
         boolean success = mCustomTabActivityHelper.mayLaunchUrl(url, null, null);
         if (!success) {
             Timber.w("Couldn't preload url: %s", url.toString());

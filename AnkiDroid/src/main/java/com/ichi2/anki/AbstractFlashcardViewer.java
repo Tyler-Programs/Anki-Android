@@ -93,6 +93,7 @@ import com.ichi2.anim.ViewAnimation;
 import com.ichi2.anki.cardviewer.GestureProcessor;
 import com.ichi2.anki.cardviewer.MissingImageHandler;
 import com.ichi2.anki.cardviewer.OnRenderProcessGoneDelegate;
+import com.ichi2.anki.cardviewer.TTS;
 import com.ichi2.anki.cardviewer.TypeAnswer;
 import com.ichi2.anki.cardviewer.ViewerCommand;
 import com.ichi2.anki.dialogs.tags.TagsDialog;
@@ -311,6 +312,8 @@ public abstract class AbstractFlashcardViewer extends NavigationDrawerActivity i
 
     public static final String DOUBLE_TAP_TIME_INTERVAL = "doubleTapTimeInterval";
     public static final int DEFAULT_DOUBLE_TAP_TIME_INTERVAL = 200;
+
+    private final TTS mTTS = new TTS();
 
     /**
      * A record of the last time the "show answer" or ease buttons were pressed. We keep track
@@ -846,7 +849,7 @@ public abstract class AbstractFlashcardViewer extends NavigationDrawerActivity i
 
         // Initialize text-to-speech. This is an asynchronous operation.
         if (mSpeakText) {
-            ReadText.initializeTts(this, new ReadTextListener());
+            mTTS.initializeTTS(this, new ReadTextListener());
         }
 
         // Initialize dictionary lookup feature
@@ -1850,7 +1853,7 @@ public abstract class AbstractFlashcardViewer extends NavigationDrawerActivity i
         }
     };
 
-    class ReadTextListener implements ReadText.ReadTextListener {
+    public class ReadTextListener implements ReadText.ReadTextListener {
         public void onDone() {
             if(!mUseTimer) {
                 return;
@@ -2172,10 +2175,10 @@ public abstract class AbstractFlashcardViewer extends NavigationDrawerActivity i
                 // If the question is displayed or if the question should be replayed, read the question
                 if (mTtsInitialized) {
                     if (!sDisplayAnswer || doAudioReplay && replayQuestion) {
-                        readCardText(mCurrentCard, SoundSide.QUESTION);
+                        mTTS.readCardText(this, mCurrentCard, SoundSide.QUESTION);
                     }
                     if (sDisplayAnswer) {
-                        readCardText(mCurrentCard, SoundSide.ANSWER);
+                        mTTS.readCardText(this, mCurrentCard, SoundSide.ANSWER);
                     }
                 } else {
                     mReplayOnTtsInit = true;
@@ -2223,7 +2226,7 @@ public abstract class AbstractFlashcardViewer extends NavigationDrawerActivity i
             return;
         }
         String clozeReplacement = this.getString(R.string.reviewer_tts_cloze_spoken_replacement);
-        ReadText.readCardSide(cardSide, cardSideContent, getDeckIdForCard(card), card.getOrd(), clozeReplacement);
+        mTTS.readCardSide(cardSide, cardSideContent, getDeckIdForCard(card), card.getOrd(), clozeReplacement);
     }
 
     /**
